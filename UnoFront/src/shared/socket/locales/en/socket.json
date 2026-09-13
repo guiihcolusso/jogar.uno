@@ -1,0 +1,10 @@
+{
+  "nameModal": {
+    "title": "UNO",
+    "subtitle": "Choose a display name to join the table.",
+    "placeholder": "Your name",
+    "confirm": "Enter the table"
+  },
+  "reconnecting": "Connection lost. Reconnecting...",
+  "reconnected": "Back online."
+}

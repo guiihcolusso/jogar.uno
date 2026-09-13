@@ -1,0 +1,14 @@
+{
+  "navbar": {
+    "logoAlt": "UNO"
+  },
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "confirm": "Confirm",
+    "tryAgain": "Try again",
+    "backToHome": "Back to home"
+  },
+  "loading": "Loading..."
+}

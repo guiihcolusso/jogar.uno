@@ -1,32 +1,23 @@
 {
-	"rootDir": "src",
-	"exclude": [
-		"../unoenty/**"
-	],
-	"compilerOptions": {
-		"types": [
-			"node"
-		],
-		"outDir": "dist",
-		"module": "CommonJS",
-		"esModuleInterop": true,
-		"sourceMap": false,
-    "rootDir": "src",
-    "target": "es6",
-    "lib": [
-			"ES2018"
-		],
-    "allowJs": true,
-    "strictPropertyInitialization": false,
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": false,
+    "removeComments": true,
     "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "sourceMap": false,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "incremental": false,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
     "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    }
-	}
+    "esModuleInterop": true
+  }
 }

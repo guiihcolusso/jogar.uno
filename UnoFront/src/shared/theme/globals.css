@@ -1,0 +1,201 @@
+@import 'tailwindcss';
+@import '@heroui/styles';
+
+/*
+ * HeroUI's theme only registers a single brand hue (`--color-accent`).
+ * The "futuristic" palette needs two more neon hues for gradients/glows
+ * (magenta, cyan), so we register them as first-class Tailwind color
+ * tokens here — this makes `bg-accent-2`, `text-accent-3`, `to-accent-2`,
+ * etc. real utilities instead of one-off arbitrary values everywhere.
+ */
+@theme inline {
+  --color-accent-2: var(--accent-2);
+  --color-accent-3: var(--accent-3);
+}
+
+/* ── Theme: Light ─────────────────────────────────────────────────── */
+:root,
+[data-theme='light'] {
+  --accent: #7c3aed;
+  --accent-2: #db2777;
+  --accent-3: #0891b2;
+  --accent-foreground: #ffffff;
+
+  --background: #f4f4f7;
+  --foreground: #0b0b12;
+
+  --surface: #ffffff;
+  --surface-foreground: #111827;
+
+  --default: #e7e7ec;
+  --default-foreground: #111827;
+
+  --success: #16a34a;
+  --success-foreground: #052e16;
+
+  --warning: #d97706;
+  --warning-foreground: #422006;
+
+  --danger: #dc2626;
+  --danger-foreground: #450a0a;
+
+  --border: #e0e0e8;
+  --separator: #e0e0e8;
+  --focus: #7c3aed;
+
+  --glow-accent: 0 0 24px -6px rgba(124, 58, 237, 0.55);
+}
+
+/* ── Theme: Dark (hero mode) ──────────────────────────────────────── */
+.dark,
+[data-theme='dark'] {
+  --accent: #8b5cf6;
+  --accent-2: #ec4899;
+  --accent-3: #22d3ee;
+  --accent-foreground: #05050a;
+
+  --background: radial-gradient(ellipse at top center, #191233 0%, #0a0a12 55%, #030304 100%);
+  --foreground: #f4f2ff;
+
+  --surface: #14121f;
+  --surface-foreground: #f4f2ff;
+
+  --default: #211f30;
+  --default-foreground: #f4f2ff;
+
+  --success: #22c55e;
+  --success-foreground: #052e16;
+
+  --warning: #facc15;
+  --warning-foreground: #422006;
+
+  --danger: #f87171;
+  --danger-foreground: #450a0a;
+
+  --border: rgba(139, 92, 246, 0.22);
+  --separator: rgba(139, 92, 246, 0.22);
+  --focus: #8b5cf6;
+
+  --glow-accent: 0 0 28px -4px rgba(139, 92, 246, 0.85);
+}
+
+:root {
+  --header-height: 64px;
+  --footer-height: 65px;
+  --envbar-height: 20px;
+
+  --radius: 0.75rem;
+  --field-radius: 0.75rem;
+
+  /* UNO card color glows — shared with `tokens.constant.ts`. */
+  --card-red: #ef4444;
+  --card-yellow: #eab308;
+  --card-green: #22c55e;
+  --card-blue: #3b82f6;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+.dark {
+  background: radial-gradient(ellipse at top center, #191233 0%, #0a0a12 55%, #030304 100%);
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--border);
+  }
+
+  body {
+    min-height: 100vh;
+    margin: 0;
+    background-attachment: fixed;
+  }
+
+  @media screen and (max-width: 768px) {
+    input[type='text'],
+    input[type='email'],
+    input[type='tel'],
+    input[type='number'],
+    select,
+    textarea {
+      font-size: 18px !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* Glassmorphism surface — table felt, hand tray, chat drawer, modals. */
+  .glass-panel {
+    background: color-mix(in oklab, var(--surface) 55%, transparent);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--border);
+  }
+
+  /* Glow ring for interactive / playable elements. */
+  .glow-accent {
+    box-shadow: var(--glow-accent);
+  }
+
+  .glow-playable {
+    box-shadow: 0 0 18px 2px rgba(34, 211, 238, 0.65);
+  }
+
+  .text-gradient-accent {
+    background-image: linear-gradient(90deg, var(--accent), var(--accent-2));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  /* Table seat layout — named grid areas for the 8 possible opponent
+   * positions plus the center discard pile. `player-seat.styles.ts` places
+   * each seat via `[grid-area:<position>]`. */
+  .uno-table-grid {
+    grid-template-areas:
+      'topLeft top topRight'
+      'left center right'
+      'bottomLeft bottom bottomRight';
+  }
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  10% {
+    transform: translateX(-6px);
+  }
+  20% {
+    transform: translateX(6px);
+  }
+  30% {
+    transform: translateX(-4px);
+  }
+  40% {
+    transform: translateX(4px);
+  }
+  50% {
+    transform: translateX(-2px);
+  }
+  60% {
+    transform: translateX(2px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 6px currentColor);
+  }
+  50% {
+    filter: drop-shadow(0 0 16px currentColor);
+  }
+}

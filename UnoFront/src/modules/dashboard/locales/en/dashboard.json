@@ -1,0 +1,20 @@
+{
+  "title": "Games",
+  "createGame": "CREATE NEW GAME",
+  "creating": "CREATING...",
+  "empty": "No open games right now. Create one to get started!",
+  "gameCard": {
+    "status": {
+      "waiting": "WAITING",
+      "playing": "PLAYING",
+      "ended": "ENDED"
+    },
+    "actions": {
+      "join": "JOIN",
+      "spectate": "SPECTATE",
+      "ended": "ENDED"
+    },
+    "slot": "SLOT LEFT",
+    "slots": "SLOTS LEFT"
+  }
+}

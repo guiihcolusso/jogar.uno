@@ -1,0 +1,46 @@
+{
+  "you": "You",
+  "buyCard": "BUY CARD",
+  "hand": {
+    "empty": "No cards left!",
+    "play": "PLAY"
+  },
+  "afk": {
+    "message": "We noticed you are afk, so we are making random plays automatically for you. Click below to keep playing yourself.",
+    "action": "I'M HERE"
+  },
+  "reactions": {
+    "uno": "UNO!",
+    "blocked": "BLOCKED!",
+    "buyCards": "BUY {amount}!"
+  },
+  "colorPicker": {
+    "title": "Choose a color!",
+    "colors": {
+      "red": "Red",
+      "yellow": "Yellow",
+      "green": "Green",
+      "blue": "Blue"
+    }
+  },
+  "winScreen": {
+    "you": "That's you!",
+    "waiting": "WAITING...",
+    "playAgain": "PLAY AGAIN",
+    "quit": "QUIT"
+  },
+  "leaveGame": {
+    "trigger": "Leave game",
+    "title": "Leave this game?",
+    "description": "You'll be disconnected from the table and can rejoin later if it's still open.",
+    "cancel": "Cancel",
+    "confirm": "Leave"
+  },
+  "chat": {
+    "trigger": "Open chat",
+    "title": "Chat",
+    "you": "You",
+    "placeholder": "Type something...",
+    "send": "Send"
+  }
+}

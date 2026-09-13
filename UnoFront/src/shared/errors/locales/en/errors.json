@@ -1,0 +1,6 @@
+{
+  "generic": "Something went wrong. Please try again.",
+  "networkError": "Connection failed. Check your internet.",
+  "notFound": "We could not find what you were looking for.",
+  "notFoundTitle": "404"
+}

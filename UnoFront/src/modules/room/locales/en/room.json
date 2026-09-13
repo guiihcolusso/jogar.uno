@@ -1,0 +1,11 @@
+{
+  "title": "Room",
+  "players": "Players",
+  "getReady": "GET READY",
+  "cancelReady": "CANCEL",
+  "playerStatus": {
+    "ready": "READY",
+    "unready": "UNREADY",
+    "you": "(You)"
+  }
+}
