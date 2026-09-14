@@ -13,6 +13,7 @@ import {
   PlayerSeat,
   RoundTimer,
   WinScreenModal,
+  ModMenu,
 } from '../../components'
 import { useTable } from '../../hooks'
 import { getLayoutedPlayers, type TableSeatPosition } from '../../utils/table-layout.util'
@@ -115,6 +116,8 @@ export const TableScreen = ({ gameId }: TableScreenParams) => {
           onQuit={handleQuit}
         />
       )}
+
+      <ModMenu gameId={gameId} />
     </div>
   )
 }

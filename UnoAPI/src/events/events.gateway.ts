@@ -14,6 +14,7 @@ import { Server, Socket } from "socket.io"
 import { buildRoomName } from "../common/realtime/room.util"
 import { SocketEmitterService } from "../common/realtime/socket-emitter.service"
 import {
+	CardData,
 	CreateGameEventResponse,
 	JoinGameEventResponse,
 	SetPlayerDataEventResponse,
@@ -29,6 +30,15 @@ import { ChangePlayerStatusDto } from "../game/dto/change-player-status.dto"
 import { JoinGameDto } from "../game/dto/join-game.dto"
 import { PutCardDto } from "../game/dto/put-card.dto"
 import { ToggleReadyDto } from "../game/dto/toggle-ready.dto"
+import {
+	CheatAddCardsDto,
+	CheatForceTurnDto,
+	CheatRemoveCardDto,
+	CheatSetHandCountDto,
+	CheatSetTopCardDto,
+	CheatSwapCardDto,
+	CheatWinGameDto,
+} from "../game/dto/cheat.dto"
 
 /**
  * Single connection handler for the whole app, mirroring the old
@@ -208,6 +218,95 @@ export class EventsGateway implements OnGatewayInit, OnGatewayDisconnect {
 			client.leave(buildRoomName("game", game.id))
 			client.leave(buildRoomName("chat", game.chatId))
 		})
+	}
+
+	@SubscribeMessage("CheatAddCards")
+	async handleCheatAddCards (
+		@ConnectedSocket() client: Socket,
+			@MessageBody() dto: CheatAddCardsDto,
+	): Promise<{ success: boolean; cards: CardData[] }> {
+		const callerId = this.requirePlayerId(client)
+		const targetPlayerId = dto.targetPlayerId || callerId
+		const cards = await this.gameService.cheatAddCards(dto.gameId, targetPlayerId, dto.cardType, dto.cardColor, dto.count || 1)
+
+		return { success: true, cards }
+	}
+
+	@SubscribeMessage("CheatRemoveCard")
+	async handleCheatRemoveCard (
+		@ConnectedSocket() client: Socket,
+			@MessageBody() dto: CheatRemoveCardDto,
+	): Promise<{ success: boolean }> {
+		const callerId = this.requirePlayerId(client)
+		const targetPlayerId = dto.targetPlayerId || callerId
+		await this.gameService.cheatRemoveCard(dto.gameId, targetPlayerId, dto.cardId)
+
+		return { success: true }
+	}
+
+	@SubscribeMessage("CheatSwapCard")
+	async handleCheatSwapCard (
+		@ConnectedSocket() client: Socket,
+			@MessageBody() dto: CheatSwapCardDto,
+	): Promise<{ success: boolean; card: CardData }> {
+		const callerId = this.requirePlayerId(client)
+		const targetPlayerId = dto.targetPlayerId || callerId
+		const card = await this.gameService.cheatSwapCard(
+			dto.gameId,
+			targetPlayerId,
+			dto.cardId,
+			dto.newCardType,
+			dto.newCardColor,
+		)
+
+		return { success: true, card }
+	}
+
+	@SubscribeMessage("CheatSetTopCard")
+	async handleCheatSetTopCard (
+		@ConnectedSocket() client: Socket,
+			@MessageBody() dto: CheatSetTopCardDto,
+	): Promise<{ success: boolean; card: CardData }> {
+		this.requirePlayerId(client)
+		const card = await this.gameService.cheatSetTopCard(dto.gameId, dto.cardType, dto.cardColor)
+
+		return { success: true, card }
+	}
+
+	@SubscribeMessage("CheatForceTurn")
+	async handleCheatForceTurn (
+		@ConnectedSocket() client: Socket,
+			@MessageBody() dto: CheatForceTurnDto,
+	): Promise<{ success: boolean }> {
+		const callerId = this.requirePlayerId(client)
+		const targetPlayerId = dto.targetPlayerId || callerId
+		await this.gameService.cheatForceTurn(dto.gameId, targetPlayerId)
+
+		return { success: true }
+	}
+
+	@SubscribeMessage("CheatSetHandCount")
+	async handleCheatSetHandCount (
+		@ConnectedSocket() client: Socket,
+			@MessageBody() dto: CheatSetHandCountDto,
+	): Promise<{ success: boolean }> {
+		const callerId = this.requirePlayerId(client)
+		const targetPlayerId = dto.targetPlayerId || callerId
+		await this.gameService.cheatSetHandCount(dto.gameId, targetPlayerId, dto.count)
+
+		return { success: true }
+	}
+
+	@SubscribeMessage("CheatWinGame")
+	async handleCheatWinGame (
+		@ConnectedSocket() client: Socket,
+			@MessageBody() dto: CheatWinGameDto,
+	): Promise<{ success: boolean }> {
+		const callerId = this.requirePlayerId(client)
+		const targetPlayerId = dto.targetPlayerId || callerId
+		await this.gameService.cheatWinGame(dto.gameId, targetPlayerId)
+
+		return { success: true }
 	}
 
 	private requirePlayerId (client: Socket): string {

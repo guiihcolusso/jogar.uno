@@ -50,6 +50,6 @@ describe('GameCard', () => {
 
   it('disables the action for ended games', () => {
     renderCard({ ...baseGame, status: 'ended' })
-    expect(screen.getByText(dashboardMessages.gameCard.actions.ended).closest('button')).toBeDisabled()
+    expect(screen.getByRole('button', { name: dashboardMessages.gameCard.actions.ended })).toBeDisabled()
   })
 })

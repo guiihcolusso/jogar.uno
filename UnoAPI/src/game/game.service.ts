@@ -9,6 +9,7 @@ import { getSanitizedValueWithBoundaries } from "../common/utils/number.util"
 import {
 	CardColors,
 	CardData,
+	CardTypes,
 	Game,
 	PlayerData,
 	PlayerStatus,
@@ -672,6 +673,194 @@ export class GameService implements OnApplicationBootstrap {
 				})
 			},
 		})
+	}
+
+	async cheatAddCards (
+		gameId: string,
+		playerId: string,
+		cardType: CardTypes,
+		cardColor: CardColors,
+		count = 1,
+	): Promise<CardData[]> {
+		const game = await this.getGame(gameId)
+		if (!game) throw new WsException("Game not found")
+
+		const cards: CardData[] = []
+		for (let i = 0; i < count; i++) {
+			cards.push(this.cardService.buildCustomCard(cardType, cardColor))
+		}
+
+		game.players = game.players?.map(player => {
+			if (player.id === playerId) {
+				return {
+					...player,
+					handCards: [...cards, ...(player.handCards || [])],
+				}
+			}
+			return player
+		})
+
+		const currentPlayerInfo = this.gameEngine.getCurrentPlayerInfo(game)
+		game.players = this.applyCardUsability(currentPlayerInfo.id, game)
+
+		await this.setGameData(gameId, game)
+
+		this.emitGameEvent(game.id, "PlayerBoughtCard", {
+			playerId,
+			cards,
+		})
+
+		return cards
+	}
+
+	async cheatRemoveCard (gameId: string, playerId: string, cardId: string): Promise<void> {
+		const game = await this.getGame(gameId)
+		if (!game) throw new WsException("Game not found")
+
+		game.players = game.players?.map(player => {
+			if (player.id === playerId) {
+				return {
+					...player,
+					handCards: player.handCards?.filter(c => c.id !== cardId) || [],
+				}
+			}
+			return player
+		})
+
+		const currentPlayerInfo = this.gameEngine.getCurrentPlayerInfo(game)
+		game.players = this.applyCardUsability(currentPlayerInfo.id, game)
+
+		await this.setGameData(gameId, game)
+
+		this.emitGameEvent(game.id, "PlayerPutCard", {
+			playerId,
+			cards: [{ id: cardId } as CardData],
+		})
+	}
+
+	async cheatSwapCard (
+		gameId: string,
+		playerId: string,
+		cardId: string,
+		newCardType: CardTypes,
+		newCardColor: CardColors,
+	): Promise<CardData> {
+		const game = await this.getGame(gameId)
+		if (!game) throw new WsException("Game not found")
+
+		const newCard = this.cardService.buildCustomCard(newCardType, newCardColor)
+
+		game.players = game.players?.map(player => {
+			if (player.id === playerId) {
+				return {
+					...player,
+					handCards: (player.handCards || []).map(card => card.id === cardId ? newCard : card),
+				}
+			}
+			return player
+		})
+
+		const currentPlayerInfo = this.gameEngine.getCurrentPlayerInfo(game)
+		game.players = this.applyCardUsability(currentPlayerInfo.id, game)
+
+		await this.setGameData(gameId, game)
+
+		this.emitGameEvent(game.id, "PlayerPutCard", {
+			playerId,
+			cards: [{ id: cardId } as CardData],
+		})
+		this.emitGameEvent(game.id, "PlayerBoughtCard", {
+			playerId,
+			cards: [newCard],
+		})
+
+		return newCard
+	}
+
+	async cheatSetTopCard (gameId: string, cardType: CardTypes, cardColor: CardColors): Promise<CardData> {
+		const game = await this.getGame(gameId)
+		if (!game) throw new WsException("Game not found")
+
+		const card = this.cardService.buildCustomCard(cardType, cardColor)
+		game.usedCards = [card, ...(game.usedCards || [])]
+		game.currentGameColor = cardColor === "black" ? "red" : cardColor
+
+		const currentPlayerInfo = this.gameEngine.getCurrentPlayerInfo(game)
+		game.players = this.applyCardUsability(currentPlayerInfo.id, game)
+
+		await this.setGameData(gameId, game)
+
+		this.emitGameEvent(game.id, "PlayerPutCard", {
+			playerId: currentPlayerInfo.id,
+			cards: [card],
+		})
+
+		return card
+	}
+
+	async cheatForceTurn (gameId: string, playerId: string): Promise<void> {
+		const game = await this.getGame(gameId)
+		if (!game) throw new WsException("Game not found")
+
+		const playerIndex = game.players.findIndex(p => p.id === playerId)
+		if (playerIndex === -1) return
+
+		game.currentPlayerIndex = playerIndex
+		game.nextPlayerIndex = game.direction === "clockwise" ? playerIndex + 1 : playerIndex - 1
+		game.players = this.applyCardUsability(playerId, game)
+
+		await this.setGameData(gameId, game)
+		await this.resetRoundCounter(gameId)
+	}
+
+	async cheatSetHandCount (gameId: string, playerId: string, targetCount: number): Promise<void> {
+		const game = await this.getGame(gameId)
+		if (!game) throw new WsException("Game not found")
+
+		game.players = game.players?.map(player => {
+			if (player.id === playerId) {
+				let handCards = [...(player.handCards || [])]
+				if (handCards.length > targetCount) {
+					handCards = handCards.slice(0, targetCount)
+				} else {
+					while (handCards.length < targetCount) {
+						handCards.push(this.cardService.buildCustomCard("change-color", "black"))
+					}
+				}
+				return { ...player, handCards }
+			}
+			return player
+		})
+
+		const currentPlayerInfo = this.gameEngine.getCurrentPlayerInfo(game)
+		game.players = this.applyCardUsability(currentPlayerInfo.id, game)
+
+		await this.setGameData(gameId, game)
+
+		const player = game.players.find(p => p.id === playerId)
+		if (player) {
+			this.emitGameEvent(game.id, "PlayerBoughtCard", {
+				playerId,
+				cards: player.handCards,
+			})
+		}
+	}
+
+	async cheatWinGame (gameId: string, playerId: string): Promise<void> {
+		const game = await this.getGame(gameId)
+		if (!game) throw new WsException("Game not found")
+
+		const player = game.players.find(p => p.id === playerId)
+		if (!player) return
+
+		this.emitGameEvent(gameId, "PlayerWon", {
+			player: {
+				id: player.id,
+				name: player.name,
+			},
+		})
+
+		await this.endGame(gameId)
 	}
 
 	private async setGameData (gameId: string, game: Game): Promise<void> {

@@ -41,14 +41,18 @@ class SocketClient {
     data: SocketClientEventMap[Event]['input'],
   ): Promise<SocketClientEventMap[Event]['response']> {
     return await new Promise((resolve, reject) => {
-      this.client.emit(event, data, (error: string | null, response: SocketClientEventMap[Event]['response']) => {
-        if (error) {
-          reject(new Error(error))
-          return
-        }
+      this.client.emit(
+        event,
+        data,
+        (response: SocketClientEventMap[Event]['response'] | { error?: string }) => {
+          if (response && typeof response === 'object' && 'error' in response && response.error) {
+            reject(new Error(String(response.error)))
+            return
+          }
 
-        resolve(response)
-      })
+          resolve(response as SocketClientEventMap[Event]['response'])
+        },
+      )
     })
   }
 

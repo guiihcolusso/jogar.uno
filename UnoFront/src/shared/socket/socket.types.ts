@@ -117,6 +117,26 @@ export type ToggleReadyEventInput = { gameId: string }
 
 export type ForceSelfDisconnectEventInput = { gameId: string }
 
+export type CheatAddCardsEventInput = {
+  gameId: string
+  targetPlayerId?: string
+  cardType: CardTypes
+  cardColor: CardColors
+  count?: number
+}
+export type CheatRemoveCardEventInput = { gameId: string; targetPlayerId?: string; cardId: string }
+export type CheatSwapCardEventInput = {
+  gameId: string
+  targetPlayerId?: string
+  cardId: string
+  newCardType: CardTypes
+  newCardColor: CardColors
+}
+export type CheatSetTopCardEventInput = { gameId: string; cardType: CardTypes; cardColor: CardColors }
+export type CheatForceTurnEventInput = { gameId: string; targetPlayerId?: string }
+export type CheatSetHandCountEventInput = { gameId: string; targetPlayerId?: string; count: number }
+export type CheatWinGameEventInput = { gameId: string; targetPlayerId?: string }
+
 export type SocketClientEventMap = {
   SetPlayerData: { input: SetPlayerDataEventInput; response: SetPlayerDataEventResponse }
   CreateGame: { input: CreateGameEventInput; response: CreateGameEventResponse }
@@ -127,6 +147,13 @@ export type SocketClientEventMap = {
   ChangePlayerStatus: { input: ChangePlayerStatusEventInput; response: unknown }
   ToggleReady: { input: ToggleReadyEventInput; response: unknown }
   ForceSelfDisconnect: { input: ForceSelfDisconnectEventInput; response: unknown }
+  CheatAddCards: { input: CheatAddCardsEventInput; response: { success: boolean; cards: CardData[] } }
+  CheatRemoveCard: { input: CheatRemoveCardEventInput; response: { success: boolean } }
+  CheatSwapCard: { input: CheatSwapCardEventInput; response: { success: boolean; card: CardData } }
+  CheatSetTopCard: { input: CheatSetTopCardEventInput; response: { success: boolean; card: CardData } }
+  CheatForceTurn: { input: CheatForceTurnEventInput; response: { success: boolean } }
+  CheatSetHandCount: { input: CheatSetHandCountEventInput; response: { success: boolean } }
+  CheatWinGame: { input: CheatWinGameEventInput; response: { success: boolean } }
 }
 
 export type SocketServerEvent = keyof SocketClientEventMap

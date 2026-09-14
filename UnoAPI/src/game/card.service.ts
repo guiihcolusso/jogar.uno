@@ -92,6 +92,20 @@ export class CardService {
 		}
 	}
 
+	buildCustomCard (cardType: CardTypes, cardColor: CardColors): CardData {
+		if (cardType === "buy-4" || cardType === "change-color") {
+			return this.buildWildCard(cardType)
+		}
+
+		return {
+			id: makeUUID(),
+			src: this.buildCardPictureSrc(cardType, cardColor),
+			name: `${cardType}-${cardColor}`,
+			color: cardColor,
+			type: cardType,
+		}
+	}
+
 	private buildCardPictureSrc (cardType: CardTypes, cardColor: CardColors): string {
 		const baseUrl = this.configService.get<string>("STATIC_FILES_BASE_URL", "")
 

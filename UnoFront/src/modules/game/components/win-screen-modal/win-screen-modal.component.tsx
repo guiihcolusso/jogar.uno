@@ -32,7 +32,7 @@ export const WinScreenModal = ({
         <Modal.Container size="sm">
           <Modal.Dialog>
             <Modal.Body>
-              <div className={styles.body()}>
+              <div className={styles.body()} data-testid="win-screen-modal">
                 <Trophy className={styles.trophy()} aria-hidden="true" />
                 <p className={styles.winnerName()}>{winnerName}</p>
                 {isCurrentPlayer && <p className={styles.you()}>{winScreen.you}</p>}

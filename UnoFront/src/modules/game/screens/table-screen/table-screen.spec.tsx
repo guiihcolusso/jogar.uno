@@ -1,6 +1,6 @@
 import { NextIntlClientProvider } from 'next-intl'
 
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 
 import gameMessages from '@/modules/game/locales/en/game.json'
 import type { Game, PlayerData } from '@/shared/socket'
@@ -11,6 +11,12 @@ const useTableMock = jest.fn()
 
 jest.mock('../../hooks', () => ({
   useTable: (params: unknown) => useTableMock(params),
+}))
+
+jest.mock('@/shared/socket', () => ({
+  ...jest.requireActual('@/shared/socket'),
+  useSocket: () => ({ on: jest.fn(() => jest.fn()), emit: jest.fn() }),
+  useGameSession: () => ({ currentPlayer: null, game: null, setGameData: jest.fn() }),
 }))
 
 const buildPlayer = (overrides: Partial<PlayerData>): PlayerData => ({
@@ -110,7 +116,8 @@ describe('TableScreen', () => {
 
     renderScreen()
 
-    expect(screen.getByText('Ada')).toBeInTheDocument()
+    const winModal = within(screen.getByTestId('win-screen-modal'))
+    expect(winModal.getByText('Ada')).toBeInTheDocument()
     expect(screen.getByText(gameMessages.winScreen.playAgain)).toBeInTheDocument()
   })
 })
